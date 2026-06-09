@@ -2,7 +2,7 @@ Package: catekappa
 Type: Package
 Title: Design and Analysis of Consistency Tests Based on Kappa
         Statistic
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person("Gai", "Zheng", email = "z2118778229@163.com", role = c("aut", "cre")),
              person("Xincheng", "Li", email = "lxc409014@qq.com", role = "aut"),
              person("Yingjie", "Jiangwang", email = "2312055564@qq.com", role = "aut"),
@@ -15,11 +15,11 @@ Encoding: UTF-8
 Config/roxygen2/version: 8.0.0
 Imports: bslib, irr, kappaSize, shiny, utils
 NeedsCompilation: no
-Packaged: 2026-05-29 12:12:46 UTC; z2118
+Packaged: 2026-06-09 08:14:30 UTC; z2118
 Author: Gai Zheng [aut, cre],
   Xincheng Li [aut],
   Yingjie Jiangwang [aut],
   Panwei Zhao [aut]
 Maintainer: Gai Zheng <z2118778229@163.com>
 Repository: CRAN
-Date/Publication: 2026-06-02 08:30:15 UTC
+Date/Publication: 2026-06-09 08:30:08 UTC

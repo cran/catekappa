@@ -1,11 +1,12 @@
-3d3b0307c18ed4cb1f6c25a78b5d8974 *DESCRIPTION
+e1ec38f3b81ac37eedd1ca50bb153f27 *DESCRIPTION
 2968067c3e95ed674ec00b2beb43f984 *NAMESPACE
+e7f488691c87a0230f9a3247b0e91212 *NEWS.md
 41122ac4712a9d943cf8eab6c92f2844 *R/analysis.R
 491235105274f7ebc5207d2fca538ac9 *R/catepk.R
 0e44468c0f9207e94bb4bbf1fd7fc89a *R/design.R
 d51e57bcd3faff3ac01868b2a7341368 *R/shiny.R
 c734c1f3cd6f77f7cb533c7e38af49f5 *R/utils.R
-4bee3447f191fdef1ed5d70b0a169872 *inst/shinyapp/app.R
+bc95b0461e75e7ee2a41c72e6d4e13b1 *inst/shinyapp/app.R
 7eb4baf7e52d2e6861b997e0802510d6 *man/analyze_kappa.Rd
 42aab23634bd262372c11145b7285969 *man/calc_sample_size_kappa.Rd
 f6639c4f73b301214448b5a9c1da61eb *man/catekappa-package.Rd

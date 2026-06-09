@@ -146,6 +146,17 @@ ui <- fluidPage(
 # ========== Server ==========
 server <- function(input, output, session) {
 
+  # 辅助函数：安全提取单值
+  safe_val <- function(x, default = "") {
+    if (is.null(x)) return(default)
+    if (length(x) == 0) return(default)
+    if (is.numeric(x) && length(x) > 1) {
+      # 如果是向量，取最后一个（通常样本量是最后一个）
+      return(tail(x, 1))
+    }
+    as.character(x[1])
+  }
+
   design_result <- eventReactive(input$calc_n, {
     props <- tryCatch({
       p <- as.numeric(unlist(strsplit(input$props, ",")))
@@ -171,25 +182,34 @@ server <- function(input, output, session) {
     req(design_result())
     res <- design_result()
 
+    n_val <- ceiling(as.numeric(safe_val(res$n, 0)))
+    kappa0_val <- safe_val(res$kappa0)
+    kappa1_val <- safe_val(res$kappa1)
+    cat_val <- safe_val(res$categories)
+    alpha_val <- safe_val(res$alpha)
+    power_val <- safe_val(res$power)
+    raters_val <- safe_val(res$raters)
+    method_val <- safe_val(res$kappaSize_function)
+
     div(
       style = "margin: 15px 0;",
       div(
-        style = paste0("background-color: ", ifelse(res$n > 200, "#f39c12", "#27ae60"),
+        style = paste0("background-color: ", ifelse(n_val > 200, "#f39c12", "#27ae60"),
                        "; color: white; padding: 20px; border-radius: 8px; text-align: center;"),
-        h2(style = "margin: 0; font-size: 48px;", ceiling(res$n)),
+        h2(style = "margin: 0; font-size: 48px;", n_val),
         p(style = "margin: 5px 0 0 0; font-size: 16px;", "Required Sample Size")
       ),
       div(
         style = "margin-top: 15px;",
         HTML(paste0(
           "<table style='width: 100%;'>",
-          "<tr><td style='padding: 5px;'><strong>Null Kappa (H0):</strong></td><td>", res$kappa0, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Alternative Kappa (H1):</strong></td><td>", res$kappa1, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Categories:</strong></td><td>", res$categories, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Significance Level:</strong></td><td>", res$alpha, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Power:</strong></td><td>", res$power, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Raters:</strong></td><td>", res$raters, "</td></tr>",
-          "<tr><td style='padding: 5px;'><strong>Method:</strong></td><td>", res$kappaSize_function, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Null Kappa (H0):</strong></td><td>", kappa0_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Alternative Kappa (H1):</strong></td><td>", kappa1_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Categories:</strong></td><td>", cat_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Significance Level:</strong></td><td>", alpha_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Power:</strong></td><td>", power_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Raters:</strong></td><td>", raters_val, "</td></tr>",
+          "<tr><td style='padding: 5px;'><strong>Method:</strong></td><td>", method_val, "</td></tr>",
           "</table>"
         ))
       )
@@ -234,22 +254,27 @@ server <- function(input, output, session) {
     res <- analysis_result()
     interp <- res$interpretation
 
+    kappa_val <- ifelse(is.null(res$kappa), NA, round(as.numeric(res$kappa), 4))
+    color_val <- ifelse(is.null(interp$color), "#7f8c8d", interp$color)
+    level_val <- ifelse(is.null(interp$level), "Unknown", interp$level)
+    desc_val <- ifelse(is.null(interp$description), "", interp$description)
+
     div(
       style = "margin: 15px 0;",
       div(
-        style = paste0("background-color: ", interp$color,
+        style = paste0("background-color: ", color_val,
                        "; color: white; padding: 20px; border-radius: 8px; text-align: center;"),
-        h2(style = "margin: 0; font-size: 36px;", round(res$kappa, 4)),
-        p(style = "margin: 5px 0 0 0; font-size: 18px;", interp$level),
-        p(style = "margin: 2px 0 0 0; font-size: 14px;", interp$description)
+        h2(style = "margin: 0; font-size: 36px;", kappa_val),
+        p(style = "margin: 5px 0 0 0; font-size: 18px;", level_val),
+        p(style = "margin: 2px 0 0 0; font-size: 14px;", desc_val)
       ),
       div(
         style = "margin-top: 15px;",
         HTML(paste0(
           "<div style='display: flex; justify-content: space-around; text-align: center;'>",
-          "<div><h4>", res$n_subjects, "</h4><p>Subjects</p></div>",
-          "<div><h4>", res$n_raters, "</h4><p>Raters</p></div>",
-          "<div><h4>", length(res$categories), "</h4><p>Categories</p></div>",
+          "<div><h4>", safe_val(res$n_subjects, 0), "</h4><p>Subjects</p></div>",
+          "<div><h4>", safe_val(res$n_raters, 0), "</h4><p>Raters</p></div>",
+          "<div><h4>", ifelse(is.null(res$categories), 0, length(res$categories)), "</h4><p>Categories</p></div>",
           "</div>"
         ))
       )
@@ -260,6 +285,10 @@ server <- function(input, output, session) {
     req(analysis_result())
     res <- analysis_result()
     interp <- res$interpretation
+
+    color_val <- ifelse(is.null(interp$color), "#7f8c8d", interp$color)
+    level_val <- ifelse(is.null(interp$level), "Unknown", interp$level)
+    desc_val <- ifelse(is.null(interp$description), "", interp$description)
 
     scale_html <- "
     <div style='margin-top: 10px; font-size: 13px; color: #666;'>
@@ -275,8 +304,8 @@ server <- function(input, output, session) {
 
     HTML(paste0(
       "<div style='background-color: #ffffff; padding: 15px; border-radius: 5px; border: 1px solid #ddd;'>",
-      "<h4 style='margin-top: 0; color: ", interp$color, ";'>", interp$level, " Agreement</h4>",
-      "<p>", interp$description, "</p>",
+      "<h4 style='margin-top: 0; color: ", color_val, ";'>", level_val, " Agreement</h4>",
+      "<p>", desc_val, "</p>",
       scale_html,
       "</div>"
     ))
